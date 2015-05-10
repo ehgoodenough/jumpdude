@@ -23,18 +23,39 @@ var HeroStore = Phlux.createStore({
     },
     updateHero: function(tick) {
         var hero = this.data
+		// Keyboard Input
         if(Keyb.isDown("A")) {
             hero.velocity.x -= hero.acceleration.x * tick
+        } if(Keyb.isDown("D")) {
+            hero.velocity.x += hero.acceleration.x * tick
         }
-        if(Keyb.isDown("D")) {
-            hero.velocity.x += 1.25 * tick
-        }
+		// Maximum Velocity
         if(hero.velocity.x > hero.maxvelocity.x) {
             hero.velocity.x = hero.maxvelocity.x
         } else if(hero.velocity.x < -hero.maxvelocity.x) {
             hero.velocity.x = -hero.maxvelocity.x
         }
-        hero.position.x += hero.velocity.x
+		// Translation and Collision
+		if(hero.velocity.x < 0) {
+			var dx = hero.position.x + hero.velocity.x - (hero.width / 2)
+			var dy = hero.position.y
+			var dt = WorldStore.getTile(dx, dy)
+			if(dt != undefined && dt.value == 0) {
+				hero.position.x += hero.velocity.x
+			} else {
+				hero.velocity.x = 0
+			}
+		} else if(hero.velocity.x > 0) {
+			var dx = hero.position.x + hero.velocity.x + (hero.width / 2)
+			var dy = hero.position.y
+			var dt = WorldStore.getTile(dx, dy)
+			if(dt != undefined && dt.value == 0) {
+				hero.position.x += hero.velocity.x
+			} else {
+				hero.velocity.x = 0
+			}
+		}
+		// Deacceleration
         if(hero.velocity.x > 0) {
             hero.velocity.x -= hero.deacceleration * tick
             if(hero.velocity.x < 0) {
