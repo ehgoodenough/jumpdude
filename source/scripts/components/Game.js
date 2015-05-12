@@ -2,6 +2,8 @@ var GameFrame = require("<scripts>/components/GameFrame")
 
 var HeroStore = Phlux.createStore({
     data: {
+        width: 1,
+        height: 1.5,
         position: {
             x: 10,
             y: 2
@@ -10,130 +12,109 @@ var HeroStore = Phlux.createStore({
             x: 0,
             y: 0
         },
-        acceleration: {
-            x: 1.5
-        },
-        width: 1,
-        height: 1.5,
         maxvelocity: {
             x: 0.25,
             y: 1
         },
-        deacceleration: 0.75
+        move: {
+            strength: 2.5
+        },
+        jump: {
+            height: 0,
+            maxheight: 3,
+            strength: 25,
+            cooldown: 0
+        },
+        friction: 0.75,
+        gravity: 2.5
     },
     updateHero: function(tick) {
         var hero = this.data
-		// Keyboard Input
-        if(Keyb.isDown("A")) {
-            hero.velocity.x -= hero.acceleration.x * tick
+        
+        // Keyboard Input
+        if(Keyb.isDown("W")) {
+            if(hero.jump.cooldown == 0
+            && hero.jump.height < hero.jump.maxheight) {
+                hero.velocity.y = hero.jump.strength * -1 * tick
+            }
+        } if(Keyb.isDown("A")) {
+            hero.velocity.x -= hero.move.strength * tick
         } if(Keyb.isDown("D")) {
-            hero.velocity.x += hero.acceleration.x * tick
+            hero.velocity.x += hero.move.strength * tick
         }
-		// Maximum Velocity
+        
+        // Gravity
+        hero.velocity.y += hero.gravity * tick
+        
+        // Maximum Velocity
         if(hero.velocity.x > hero.maxvelocity.x) {
             hero.velocity.x = hero.maxvelocity.x
         } else if(hero.velocity.x < -hero.maxvelocity.x) {
             hero.velocity.x = -hero.maxvelocity.x
+        } if(hero.velocity.y > hero.maxvelocity.y) {
+            hero.velocity.y = hero.maxvelocity.y
+        } else if(hero.velocity.y < -hero.maxvelocity.y) {
+            hero.velocity.y = -hero.maxvelocity.y
         }
-		// Translation and Collision
-		if(hero.velocity.x < 0) {
-			var dx = hero.position.x + hero.velocity.x - (hero.width / 2)
-			var dy = hero.position.y
-			var dt = WorldStore.getTile(dx, dy)
-			if(dt != undefined && dt.value == 0) {
-				hero.position.x += hero.velocity.x
-			} else {
-				hero.velocity.x = 0
-			}
-		} else if(hero.velocity.x > 0) {
-			var dx = hero.position.x + hero.velocity.x + (hero.width / 2)
-			var dy = hero.position.y
-			var dt = WorldStore.getTile(dx, dy)
-			if(dt != undefined && dt.value == 0) {
-				hero.position.x += hero.velocity.x
-			} else {
-				hero.velocity.x = 0
-			}
-		}
-		// Deacceleration
+        
+        // Translation and Collision
+        if(hero.velocity.x < 0) {
+            if(hero.position.x - (hero.width / 2) + hero.velocity.x > 0) {
+                hero.position.x += hero.velocity.x
+            } else {
+                hero.velocity.x = 0
+                hero.position.x = 0 + (hero.width / 2)
+            }
+        } else if(hero.velocity.x > 0) {
+            if(hero.position.x + (hero.width / 2) + hero.velocity.x < WIDTH) {
+                hero.position.x += hero.velocity.x
+            } else {
+                hero.velocity.x = 0
+                hero.position.x = WIDTH - (hero.width / 2)
+            }
+        } if(hero.velocity.y < 0) {
+            hero.jump.height -= hero.velocity.y
+            if(hero.position.y - (hero.height / 2) + hero.velocity.y > 0) {
+                hero.position.y += hero.velocity.y
+            } else {
+                hero.velocity.y = 0
+                hero.position.y = 0 + (hero.height / 2)
+            }
+        } else if(hero.velocity.y > 0) {
+            if(hero.position.y + (hero.height / 2) + hero.velocity.y < HEIGHT) {
+                hero.position.y += hero.velocity.y
+            } else {
+                hero.velocity.y = 0
+                hero.position.y = HEIGHT - (hero.height / 2)
+                if(hero.jump.height > 0) {
+                    hero.jump.height = 0
+                    hero.jump.cooldown = 0.075
+                }
+            }
+        }
+        
+        // Jumps
+        if(hero.jump.cooldown > 0) {
+            hero.jump.cooldown -= tick
+            if(hero.jump.cooldown < 0) {
+                hero.jump.cooldown = 0
+            }
+        }
+        
+        // Deacceleration
         if(hero.velocity.x > 0) {
-            hero.velocity.x -= hero.deacceleration * tick
+            hero.velocity.x -= hero.friction * tick
             if(hero.velocity.x < 0) {
                 hero.velocity.x = 0
             }
         } else if(hero.velocity.x < 0) {
-            hero.velocity.x += hero.deacceleration * tick
+            hero.velocity.x += hero.friction * tick
             if(hero.velocity.x > 0) {
                 hero.velocity.x = 0
             }
         }
         
-        /*
-        hero.velocity.y += 1 * tick
-        if(hero.velocity.y > hero.maxvelocity.y) {
-            hero.velocity.y = hero.maxvelocity.y
-        }
-        var dx = hero.position.x
-        var dy = hero.position.y + hero.velocity.y + (hero.height / 2)
-        if(WorldStore.getTile(dx, dy).value == 0) {
-            hero.position.y += hero.velocity.y
-        } else {
-            hero.velocity.y = 0
-        }
-        */
-        
         this.trigger()
-    }
-})
-
-var WorldData = require("<assets>/levels/world.json")
-var WorldStore = Phlux.createStore({
-    data: {
-        tiles: {},
-        width: 0,
-        height: 0
-    },
-    initiateStore: function() {
-        this.data.width = WorldData.width
-        this.data.height = WorldData.height
-        var tiles = WorldData.layers[0].data
-        for(var x = 0; x < WorldData.width; x++) {
-            for(var y = 0; y < WorldData.height; y++) {
-                var xy = y * WorldData.width + x
-                this.data.tiles[x + "x" + y] = {
-                    value: WorldData.layers[0].data[xy] - 1,
-                    position: {"x": x, "y": y}
-                }
-            }
-        }
-    },
-    getTile: function(x, y) {
-        var x = Math.floor(x)
-        var y = Math.floor(y)
-        if(x > 0 && x < this.data.width
-        && y > 0 && y < this.data.height) {
-            return this.data.tiles[x + "x" + y]
-        }
-    }
-})
-
-var Game = React.createClass({
-    mixins: [
-        Phlux.connectStore(HeroStore, "hero"),
-        Phlux.connectStore(WorldStore, "world")
-    ],
-    render: function() {
-        return (
-            <GameFrame aspect-ratio="20x15">
-                <World data={this.state["world"]}/>
-                <Hero data={this.state["hero"]}/>
-            </GameFrame>
-        )
-    },
-    componentDidMount: function() {
-        Tickly.loop(function(tick) {
-            HeroStore.updateHero(tick)
-        })
     }
 })
 
@@ -153,43 +134,21 @@ var Hero = React.createClass({
     }
 })
 
-var World = React.createClass({
+var Game = React.createClass({
+    mixins: [
+        Phlux.connectStore(HeroStore, "hero")
+    ],
     render: function() {
         return (
-            <canvas ref="canvas"
-                style={this.renderStyles()}
-                width={this.props.data.width * 64}
-                height={this.props.data.height * 64}/>
+            <GameFrame aspect-ratio="20x15">
+                <Hero data={this.state["hero"]}/>
+            </GameFrame>
         )
     },
-    renderStyles: function() {
-        return {
-            "width": this.props.data.width + "em",
-            "height": this.props.data.height + "em"
-        }
-    },
-    renderCanvas: function() {
-        var canvas = this.refs.canvas.getDOMNode().getContext("2d")
-        for(var coords in this.props.data.tiles) {
-            var tile = this.props.data.tiles[coords]
-            canvas.fillStyle = this.colors[tile.value]
-            var x = tile.position.x * 64
-            var y = tile.position.y * 64
-            canvas.fillRect(x, y, 64, 64)
-        }
-    },
     componentDidMount: function() {
-        this.renderCanvas()
-    },
-    shouldComponentUpdate: function(props) {
-        return props.data.tiles != this.props.data.tiles
-    },
-    componentDidUpdate: function() {
-        this.renderCanvas()
-    },
-    colors: {
-        "0": "#EEE",
-        "1": "#111"
+        Tickly.loop(function(tick) {
+            HeroStore.updateHero(tick)
+        })
     }
 })
 
