@@ -1,3 +1,5 @@
+var WorldStore = require("<scripts>/stores/WorldStore")
+
 var HeroStore = Phlux.createStore({
     data: {
         width: 1,
@@ -5,7 +7,7 @@ var HeroStore = Phlux.createStore({
         color: "#FC0",
         position: {
             x: 10,
-            y: 2
+            y: 13.25
         },
         velocity: {
             x: 0,
@@ -61,37 +63,12 @@ var HeroStore = Phlux.createStore({
             hero.velocity.y = -hero.maxvelocity.y
         }
         
-        // Translation and Collision
-        if(hero.velocity.x < 0) {
-            if(hero.position.x - (hero.width / 2) + hero.velocity.x > 0) {
-                hero.position.x += hero.velocity.x
-            } else {
-                hero.velocity.x /= 2
-                hero.position.x = 0 + (hero.width / 2)
-            }
-        } else if(hero.velocity.x > 0) {
-            if(hero.position.x + (hero.width / 2) + hero.velocity.x < WIDTH) {
-                hero.position.x += hero.velocity.x
-            } else {
-                hero.velocity.x /= 2
-                hero.position.x = WIDTH - (hero.width / 2)
-            }
-        } if(hero.velocity.y < 0) {
-            if(hero.position.y - (hero.height / 2) + hero.velocity.y > 0) {
-                hero.position.y += hero.velocity.y
-            } else {
-                hero.velocity.y /= 2
-                hero.position.y = 0 + (hero.height / 2)
-            }
-        } else if(hero.velocity.y > 0) {
-            if(hero.position.y + (hero.height / 2) + hero.velocity.y < HEIGHT) {
-                hero.position.y += hero.velocity.y
-            } else {
-                hero.velocity.y /= 2
-                hero.position.y = HEIGHT - (hero.height / 2)
-                hero.jump.count = 0
-            }
-        }
+        // Collision with World
+        WorldStore.collide(hero)
+        
+        // Translation
+        hero.position.x += hero.velocity.x
+        hero.position.y += hero.velocity.y
         
         // Jumps
         if(hero.velocity.y < 0) {
