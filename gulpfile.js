@@ -2,6 +2,7 @@ var gulp = require("gulp")
 var gulp_if = require("gulp-if")
 var gulp_util = require("gulp-util")
 var gulp_sass = require("gulp-sass")
+var gulp_jscs = require("gulp-jscs")
 var gulp_uglify = require("gulp-uglify")
 var gulp_connect = require("gulp-connect")
 var gulp_minify_css = require("gulp-minify-css")
@@ -55,6 +56,7 @@ gulp.task("build:scripts", function() {
     browserify.bundle()
         .pipe(vinyl_source("index.js"))
         .pipe(vinyl_buffer())
+        .pipe(gulp_jscs("./.jscsrc"))
         .pipe(gulp_if(yargs.argv.minify, gulp_uglify()))
         .pipe(gulp.dest("./build"))
         .pipe(gulp_connect.reload())
@@ -118,6 +120,11 @@ gulp.task("watch:assets", function() {
     })
 })
 
+gulp.task("lint:scripts", function() {
+    gulp.src("./source/**/*.js")
+        .pipe(gulp_jscs("./.jscsrc"))
+})
+
 gulp.task("server", function() {
     gulp.start("watch")
     gulp_connect.server({
@@ -129,6 +136,6 @@ gulp.task("server", function() {
 })
 
 process.on("uncaughtException", function (error) {
-    console.log(chalk.red(error))
+    console.log(chalk.red(error.message))
     gulp_util.beep()
 })
