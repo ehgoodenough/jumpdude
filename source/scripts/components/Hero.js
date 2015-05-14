@@ -4,7 +4,7 @@ var Hero = React.createClass({
     },
     renderStyles: function() {
         var color = this.props.data.color
-        var stretch = Math.min(this.props.data.velocity.y * 0.75, 0.25)
+        var stretch = Math.min(this.props.data.velocity.y * 0.75, 0.25) * 0
         var width = this.props.data.width + stretch
         var height = this.props.data.height - stretch
         var x = this.props.data.position.x - (width / 2)
