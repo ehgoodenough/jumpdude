@@ -1,3 +1,4 @@
+var Camera = require("<scripts>/components/Camera")
 var GameFrame = require("<scripts>/components/GameFrame")
 
 var Hero = require("<scripts>/components/Hero")
@@ -13,8 +14,10 @@ var Game = React.createClass({
     render: function() {
         return (
             <GameFrame aspect-ratio="20x15">
-                <World data={this.state["world"]}/>
-                <Hero data={this.state["hero"]}/>
+                <Camera target={this.state["hero"]}>
+                    <World data={this.state["world"]}/>
+                    <Hero data={this.state["hero"]}/>
+                </Camera>
             </GameFrame>
         )
     },
