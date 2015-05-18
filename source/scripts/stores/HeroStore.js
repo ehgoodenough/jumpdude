@@ -15,19 +15,19 @@ var HeroStore = Phlux.createStore({
         },
         maxvelocity: {
             x: 0.25,
-            y: 0.75
+            y: 0.45
         },
         move: {
-            force: 2.5
+            force: 5
         },
         jump: {
-            force: 25,
+            force: -10,
             count: 0,
             maxcount: 2,
             height: 0,
-            maxheight: 3,
+            maxheight: 2.5,
         },
-        friction: 0.75,
+        friction: 2,
         gravity: 2.5
     },
     updateHero: function(tick) {
@@ -41,16 +41,13 @@ var HeroStore = Phlux.createStore({
             }
         } if(Keyb.isDown("W")) {
             if(hero.jump.height < hero.jump.maxheight) {
-                hero.velocity.y = -hero.jump.force * tick
+                hero.velocity.y = hero.jump.force
             }
         } if(Keyb.isDown("A")) {
             hero.velocity.x -= hero.move.force * tick
         } if(Keyb.isDown("D")) {
             hero.velocity.x += hero.move.force * tick
         }
-        
-        // Gravity
-        hero.velocity.y += hero.gravity * tick
         
         // Maximum Velocity
         if(hero.velocity.x > hero.maxvelocity.x) {
@@ -87,6 +84,7 @@ var HeroStore = Phlux.createStore({
                 hero.velocity.x = 0
             }
         }
+        hero.velocity.y += hero.gravity * tick
         
         this.trigger()
     }
