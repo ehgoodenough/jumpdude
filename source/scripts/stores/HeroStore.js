@@ -5,14 +5,6 @@ var HeroStore = Phlux.createStore({
         width: 1,
         height: 1.5,
         color: "#FC0",
-        position: {
-            x: 10,
-            y: 13.25
-        },
-        velocity: {
-            x: 0,
-            y: 0
-        },
         maxvelocity: {
             x: 0.25,
             y: 0.45
@@ -28,10 +20,31 @@ var HeroStore = Phlux.createStore({
             maxheight: 2.5,
         },
         friction: 2,
-        gravity: 2.5
+        gravity: 2.5,
+        maxhealth: 10,
+        spawn: {
+            x: 10,
+            y: 13.25
+        }
     },
     updateHero: function(tick) {
         var hero = this.data
+        
+        if(hero.position == undefined) {
+            hero.position = {
+                x: hero.spawn.x,
+                y: hero.spawn.y
+            }
+        }
+        if(hero.velocity == undefined) {
+            hero.velocity = {
+                x: 0,
+                y: 0
+            }
+        }
+        if(hero.health == undefined) {
+            hero.health = hero.maxhealth
+        }
         
         // Keyboard Input
         if(Keyb.isJustDown("W")) {
@@ -67,11 +80,6 @@ var HeroStore = Phlux.createStore({
         hero.position.x += hero.velocity.x
         hero.position.y += hero.velocity.y
         
-        // Jumps
-        if(hero.velocity.y < 0) {
-            hero.jump.height -= hero.velocity.y
-        }
-        
         // Deacceleration
         if(hero.velocity.x > 0) {
             hero.velocity.x -= hero.friction * tick
@@ -85,6 +93,39 @@ var HeroStore = Phlux.createStore({
             }
         }
         hero.velocity.y += hero.gravity * tick
+        if(hero.velocity.y < 0) {
+            hero.jump.height -= hero.velocity.y
+        }
+        
+        // Effects from World
+        var damage = 0
+        var tiles = WorldStore.getTiles(hero)
+        for(var index in tiles) {
+            var tile = tiles[index]
+            if(tile.inflictsDamage != undefined) {
+                if(parseInt(tile.inflictsDamage) > damage) {
+                    damage = parseInt(tile.inflictsDamage)
+                }
+            }
+        }
+        hero.health -= damage
+        
+        for(var index in tiles) {
+            var tile = tiles[index]
+            if(tile.resetsSpawn != undefined) {
+                hero.spawn = {
+                    x: hero.position.x,
+                    y: hero.position.y
+                }
+            }
+        }
+        
+        // Death
+        if(hero.health <= 0) {
+            delete hero.position
+            delete hero.velocity
+            delete hero.health
+        }
         
         this.trigger()
     }
