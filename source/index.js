@@ -1,4 +1,4 @@
-window.React = require("react/addons")
+window.React = require("react")
 window.Phlux = require("phlux")
 window.Tickly = require("tickly")
 window.Keyb = require("keyb")

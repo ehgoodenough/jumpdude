@@ -56,7 +56,6 @@ gulp.task("build:scripts", function() {
     browserify.bundle()
         .pipe(vinyl_source("index.js"))
         .pipe(vinyl_buffer())
-        .pipe(gulp_jscs("./.jscsrc"))
         .pipe(gulp_if(yargs.argv.minify, gulp_uglify()))
         .pipe(gulp.dest("./build"))
         .pipe(gulp_connect.reload())
