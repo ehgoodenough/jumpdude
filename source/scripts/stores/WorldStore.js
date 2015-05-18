@@ -12,7 +12,7 @@ var WorldStore = Phlux.createStore({
             for(var y = 0; y < WorldData.height; y++) {
                 var xy = y * WorldData.width + x
                 var id = WorldData.layers[0].data[xy] - 1
-                this.data.tiles[x+"x"+y] = {
+                this.data.tiles[x + "x" + y] = {
                     "id": id,
                     "image": {
                         "file": tileset.image,
@@ -30,7 +30,7 @@ var WorldStore = Phlux.createStore({
                 if(properties != undefined) {
                     for(var key in properties) {
                         var value = properties[key]
-                        this.data.tiles[x+"x"+y][key] = value
+                        this.data.tiles[x + "x" + y][key] = value
                     }
                 }
             }
