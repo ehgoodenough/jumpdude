@@ -6,11 +6,11 @@
     "url": "https://github.com/ehgoodenough/jumpdude"
   },
   "dependencies": {
-    "keyb": "^1.0.1",
+    "keyb": "^1.0.4",
     "local-storage": "^1.4.2",
-    "phlux": "^1.0.0",
+    "phlux": "^1.0.2",
     "react": "~0.12.2",
-    "tickly": "^1.0.0"
+    "tickly": "^1.0.1"
   },
   "devDependencies": {
     "aliasify": "~1.7.2",

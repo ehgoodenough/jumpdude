@@ -52,34 +52,49 @@ gulp.task("build", function() {
     ])
 })
 
-gulp.task("build:scripts", function() {
-    browserify.bundle()
-        .pipe(vinyl_source("index.js"))
-        .pipe(vinyl_buffer())
-        .pipe(gulp_if(yargs.argv.minify, gulp_uglify()))
-        .pipe(gulp.dest("./build"))
-        .pipe(gulp_connect.reload())
+gulp.task("build:scripts", ["lint:scripts"], function() {
+    return (
+        browserify.bundle()
+            .pipe(vinyl_source("index.js"))
+            .pipe(vinyl_buffer())
+            .pipe(gulp_if(yargs.argv.minify, gulp_uglify()))
+            .pipe(gulp.dest("./build"))
+            .pipe(gulp_connect.reload())
+    )
 })
 
 gulp.task("build:styles", function() {
-    gulp.src("./source/index.scss")
-        .pipe(gulp_sass())
-        .pipe(gulp_prefixify_css())
-        .pipe(gulp_if(yargs.argv.minify, gulp_minify_css()))
-        .pipe(gulp.dest("./build"))
-        .pipe(gulp_connect.reload())
+    return (
+        gulp.src("./source/index.scss")
+            .pipe(gulp_sass())
+            .pipe(gulp_prefixify_css())
+            .pipe(gulp_if(yargs.argv.minify, gulp_minify_css()))
+            .pipe(gulp.dest("./build"))
+            .pipe(gulp_connect.reload())
+    )
 })
 
 gulp.task("build:markup", function() {
-    gulp.src("./source/index.html")
-        .pipe(gulp_if(yargs.argv.minify, gulp_minify_html()))
-        .pipe(gulp.dest("./build"))
+    return (
+        gulp.src("./source/index.html")
+            .pipe(gulp_if(yargs.argv.minify, gulp_minify_html()))
+            .pipe(gulp.dest("./build"))
+    )
 })
 
 gulp.task("build:assets", function() {
-    gulp.src("./source/assets/**/*", {base: "./source"})
-        .pipe(gulp.dest("./build"))
-        .pipe(gulp_connect.reload())
+    return (
+        gulp.src("./source/assets/**/*", {base: "./source"})
+            .pipe(gulp.dest("./build"))
+            .pipe(gulp_connect.reload())
+    )
+})
+
+gulp.task("lint:scripts", function() {
+    return (
+        gulp.src("./source/**/*.js")
+            .pipe(gulp_jscs("./.jscsrc"))
+    )
 })
 
 gulp.task("watch", function() {
@@ -117,11 +132,6 @@ gulp.task("watch:assets", function() {
     gulp.watch("./source/assets/**/*", function() {
         gulp.start("build:assets")
     })
-})
-
-gulp.task("lint:scripts", function() {
-    gulp.src("./source/**/*.js")
-        .pipe(gulp_jscs("./.jscsrc"))
 })
 
 gulp.task("server", function() {
