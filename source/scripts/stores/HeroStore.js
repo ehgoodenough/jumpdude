@@ -23,8 +23,16 @@ var HeroStore = Phlux.createStore({
         gravity: 2.5,
         maxhealth: 10,
         spawn: {
-            x: 10,
-            y: 13.25
+            position: {
+                x: 10,
+                y: 13.25
+            }
+        }
+    },
+    initiateStore: function() {
+        var spawn = LocalStorage.get("spawn")
+        if(spawn != undefined) {
+            this.data.spawn = spawn
         }
     },
     updateHero: function(tick) {
@@ -32,8 +40,8 @@ var HeroStore = Phlux.createStore({
         
         if(hero.position == undefined) {
             hero.position = {
-                x: hero.spawn.x,
-                y: hero.spawn.y
+                x: hero.spawn.position.x,
+                y: hero.spawn.position.y
             }
         }
         if(hero.velocity == undefined) {
@@ -113,9 +121,13 @@ var HeroStore = Phlux.createStore({
         for(var index in tiles) {
             var tile = tiles[index]
             if(tile.resetsSpawn != undefined) {
-                hero.spawn = {
-                    x: hero.position.x,
-                    y: hero.position.y
+                if(hero.spawn.position.x != tile.position.x + (hero.width / 2)
+                || hero.spawn.position.y != tile.position.y + (hero.height / 2)) {
+                    hero.spawn.position = {
+                        x: tile.position.x + (hero.width / 2),
+                        y: tile.position.y + (hero.height / 2)
+                    }
+                    LocalStorage.set("spawn", hero.spawn)
                 }
             }
         }

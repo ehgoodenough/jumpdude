@@ -3,7 +3,6 @@ var GameFrame = require("<scripts>/components/GameFrame")
 
 var Hero = require("<scripts>/components/Hero")
 var World = require("<scripts>/components/World")
-var WorldMap = require("<scripts>/components/WorldMap")
 
 var HeroStore = require("<scripts>/stores/HeroStore")
 var WorldStore = require("<scripts>/stores/WorldStore")
@@ -20,7 +19,6 @@ var Game = React.createClass({
                     <World data={this.state["world"]}/>
                     <Hero data={this.state["hero"]}/>
                 </Camera>
-                <WorldMap data={this.state["world"]}/>
             </GameFrame>
         )
     },
