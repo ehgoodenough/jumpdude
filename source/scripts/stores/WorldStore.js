@@ -1,24 +1,42 @@
-var WorldData = require("<assets>/levels/world.json")
+var WorldData = require("<assets>/tilemaps/world.json")
 
 var WorldStore = Phlux.createStore({
-    data: {
-        tiles: {},
-        width: 0,
-        height: 0
-    },
     initiateStore: function() {
         this.data.width = WorldData.width
         this.data.height = WorldData.height
+        
+        this.data.tiles = new Object()
+        var tileset = WorldData.tilesets[0]
         var tiles = WorldData.layers[0].data
         for(var x = 0; x < WorldData.width; x++) {
             for(var y = 0; y < WorldData.height; y++) {
                 var xy = y * WorldData.width + x
-                this.data.tiles[x + "x" + y] = {
-                    value: WorldData.layers[0].data[xy] - 1,
-                    position: {"x": x, "y": y}
+                var id = WorldData.layers[0].data[xy] - 1
+                this.data.tiles[x+"x"+y] = {
+                    "id": id,
+                    "image": {
+                        "file": tileset.image,
+                        "position": {
+                            "x": id - (Math.floor(id / tileset.tilewidth) * tileset.tilewidth),
+                            "y": Math.floor(id / tileset.tilewidth)
+                        }
+                    },
+                    "position": {
+                        "x": x,
+                        "y": y
+                    }
+                }
+                var properties = tileset.tileproperties[id]
+                if(properties != undefined) {
+                    for(var key in properties) {
+                        var value = properties[key]
+                        this.data.tiles[x+"x"+y][key] = value
+                    }
                 }
             }
         }
+        
+        this.data.image = "./assets/tilemaps/" + tileset.image
     },
     getTile: function(x, y) {
         var x = Math.floor(x)
@@ -28,7 +46,8 @@ var WorldStore = Phlux.createStore({
             return this.data.tiles[x + "x" + y]
         } else {
             return {
-                value: 1,
+                id: 1,
+                hasCollision: true,
                 position: {"x": x, "y": y}
             }
         }
@@ -45,7 +64,7 @@ var WorldStore = Phlux.createStore({
         })
         for(var index in ytiles) {
             var tile = ytiles[index]
-            if(tile.value == 1) {
+            if(tile.hasCollision) {
                 if(hero.velocity.y > 0) {
                     hero.position.y = tile.position.y - (hero.height / 2)
                     hero.jump.height = 0
@@ -68,7 +87,7 @@ var WorldStore = Phlux.createStore({
         })
         for(var index in xtiles) {
             var tile = xtiles[index]
-            if(tile.value == 1) {
+            if(tile.hasCollision) {
                 if(hero.velocity.x > 0) {
                     hero.position.x = tile.position.x - (hero.width / 2)
                 } else if(hero.velocity.x < 0) {

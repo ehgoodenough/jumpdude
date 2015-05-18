@@ -9,18 +9,31 @@ var World = React.createClass({
     },
     renderStyles: function() {
         return {
-            "width": this.props.data.width + "em",
-            "height": this.props.data.height + "em"
+            width: this.props.data.width + "em",
+            height: this.props.data.height + "em"
         }
     },
     renderCanvas: function() {
-        var canvas = this.refs.canvas.getDOMNode().getContext("2d")
-        for(var coords in this.props.data.tiles) {
-            var tile = this.props.data.tiles[coords]
-            canvas.fillStyle = this.colors[tile.value]
-            var x = tile.position.x * 64
-            var y = tile.position.y * 64
-            canvas.fillRect(x, y, 64, 64)
+        if(this.image == null) {
+            this.image = new Image()
+            this.image.onload = function() {
+                this.renderCanvas()
+            }.bind(this)
+            this.image.src = this.props.data.image
+        } else {
+            var canvas = this.refs.canvas.getDOMNode().getContext("2d")
+            for(var coords in this.props.data.tiles) {
+                var tile = this.props.data.tiles[coords]
+                canvas.drawImage(this.image,
+                    tile.image.position.x * 64,
+                    tile.image.position.y * 64,
+                    64,
+                    64,
+                    tile.position.x * 64,
+                    tile.position.y * 64,
+                    64,
+                    64)
+            }
         }
     },
     componentDidMount: function() {
@@ -31,10 +44,6 @@ var World = React.createClass({
     },
     componentDidUpdate: function() {
         this.renderCanvas()
-    },
-    colors: {
-        "0": "#EEE",
-        "1": "#111"
     }
 })
 
