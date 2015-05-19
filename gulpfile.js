@@ -18,7 +18,6 @@ var aliasify = require("aliasify")
 
 var opn = require("opn")
 var del = require("del")
-var chalk = require("chalk")
 var yargs = require("yargs")
 var vinyl_buffer = require("vinyl-buffer")
 var vinyl_source = require("vinyl-source-stream")
@@ -52,9 +51,18 @@ gulp.task("build", function() {
     ])
 })
 
+gulp.task("lint:scripts", function() {
+    return (
+        gulp.src("./source/**/*.js")
+            .pipe(gulp_jscs("./.jscsrc"))
+            .on("error", barf)
+    )
+})
+
 gulp.task("build:scripts", ["lint:scripts"], function() {
     return (
         browserify.bundle()
+            .on("error", barf)
             .pipe(vinyl_source("index.js"))
             .pipe(vinyl_buffer())
             .pipe(gulp_if(yargs.argv.minify, gulp_uglify()))
@@ -67,6 +75,7 @@ gulp.task("build:styles", function() {
     return (
         gulp.src("./source/index.scss")
             .pipe(gulp_sass())
+            .on("error", barf)
             .pipe(gulp_prefixify_css())
             .pipe(gulp_if(yargs.argv.minify, gulp_minify_css()))
             .pipe(gulp.dest("./build"))
@@ -87,13 +96,6 @@ gulp.task("build:assets", function() {
         gulp.src("./source/assets/**/*", {base: "./source"})
             .pipe(gulp.dest("./build"))
             .pipe(gulp_connect.reload())
-    )
-})
-
-gulp.task("lint:scripts", function() {
-    return (
-        gulp.src("./source/**/*.js")
-            .pipe(gulp_jscs("./.jscsrc"))
     )
 })
 
@@ -144,7 +146,14 @@ gulp.task("server", function() {
     opn("http://localhost:8080")
 })
 
-process.on("uncaughtException", function (error) {
-    console.log(chalk.red(error.message))
-    gulp_util.beep()
+var barf = function(error) {
+    console.log(error.message)
+    this.emit("end")
+    //gulp_util.log(error.message)
+    //gulp_util.beep()
+}
+
+process.on("uncaughtException", function(error) {
+    console.log("uh oh uh oh uh oh!")
+    console.log(error.message)
 })
