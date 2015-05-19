@@ -4,7 +4,7 @@ window.Tickly = require("tickly")
 window.Keyb = require("keyb")
 window.LocalStorage = require("local-storage")
 
-window.WIDTH = 20;
+window.WIDTH = 20
 window.HEIGHT = 15
 
 var Game = require("<scripts>/components/Game")
