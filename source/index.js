@@ -2,7 +2,6 @@ window.React = require("react")
 window.Phlux = require("phlux")
 window.Tickly = require("tickly")
 window.Keyb = require("keyb")
-window.LocalStorage = require("local-storage")
 
 window.WIDTH = 20
 window.HEIGHT = 15

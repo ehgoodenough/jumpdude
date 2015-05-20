@@ -29,15 +29,9 @@ var HeroStore = Phlux.createStore({
             }
         }
     },
-    initiateStore: function() {
-        var spawn = LocalStorage.get("spawn")
-        if(spawn != undefined) {
-            this.data.spawn = spawn
-        }
-    },
     updateHero: function(tick) {
         var hero = this.data
-        
+
         if(hero.position == undefined) {
             hero.position = {
                 x: hero.spawn.position.x,
@@ -53,7 +47,7 @@ var HeroStore = Phlux.createStore({
         if(hero.health == undefined) {
             hero.health = hero.maxhealth
         }
-        
+
         // Keyboard Input
         if(Keyb.isJustDown("W")) {
             if(hero.jump.count < hero.jump.maxcount) {
@@ -69,7 +63,7 @@ var HeroStore = Phlux.createStore({
         } if(Keyb.isDown("D")) {
             hero.velocity.x += hero.move.force * tick
         }
-        
+
         // Maximum Velocity
         if(hero.velocity.x > hero.maxvelocity.x) {
             hero.velocity.x = hero.maxvelocity.x
@@ -80,14 +74,14 @@ var HeroStore = Phlux.createStore({
         } if(hero.velocity.y < -hero.maxvelocity.y) {
             hero.velocity.y = -hero.maxvelocity.y
         }
-        
+
         // Collision with World
         WorldStore.collide(hero)
-        
+
         // Translation
         hero.position.x += hero.velocity.x
         hero.position.y += hero.velocity.y
-        
+
         // Deacceleration
         if(hero.velocity.x > 0) {
             hero.velocity.x -= hero.friction * tick
@@ -104,7 +98,7 @@ var HeroStore = Phlux.createStore({
         if(hero.velocity.y < 0) {
             hero.jump.height -= hero.velocity.y
         }
-        
+
         // Effects from World
         var damage = 0
         var tiles = WorldStore.getTiles(hero)
@@ -117,7 +111,7 @@ var HeroStore = Phlux.createStore({
             }
         }
         hero.health -= damage
-        
+
         for(var index in tiles) {
             var tile = tiles[index]
             if(tile.resetsSpawn != undefined) {
@@ -127,18 +121,17 @@ var HeroStore = Phlux.createStore({
                         x: tile.position.x + (hero.width / 2),
                         y: tile.position.y + (hero.height / 2)
                     }
-                    LocalStorage.set("spawn", hero.spawn)
                 }
             }
         }
-        
+
         // Death
         if(hero.health <= 0) {
             delete hero.position
             delete hero.velocity
             delete hero.health
         }
-        
+
         this.trigger()
     }
 })

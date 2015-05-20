@@ -54,19 +54,12 @@ gulp.task("build", function() {
 gulp.task("build:scripts", function() {
     //gulp.src("./source/**/*.js")
     //    .pipe(gulp_jscs("./.jscsrc"))
-    //    .pipe(vinyl_buffer())
-    //    .on("end", function() {
-    //        console.log("!")
-    //    })
     browserify.bundle()
         .pipe(vinyl_source("index.js"))
         .pipe(vinyl_buffer())
         .pipe(gulp_if(yargs.argv.minify, gulp_uglify()))
         .pipe(gulp.dest("./build"))
         .pipe(gulp_connect.reload())
-        .on("end", function() {
-            console.log("done")
-        })
 })
 
 gulp.task("build:styles", function() {
@@ -82,6 +75,7 @@ gulp.task("build:markup", function() {
     gulp.src("./source/index.html")
         .pipe(gulp_if(yargs.argv.minify, gulp_minify_html()))
         .pipe(gulp.dest("./build"))
+        .pipe(gulp_connect.reload())
 })
 
 gulp.task("build:assets", function() {
