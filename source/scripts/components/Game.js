@@ -3,7 +3,6 @@ var GameFrame = require("<scripts>/components/GameFrame")
 
 var Hero = require("<scripts>/components/Hero")
 var World = require("<scripts>/components/World")
-
 var HeroStore = require("<scripts>/stores/HeroStore")
 var WorldStore = require("<scripts>/stores/WorldStore")
 

@@ -19,6 +19,7 @@ var aliasify = require("aliasify")
 var opn = require("opn")
 var del = require("del")
 var yargs = require("yargs")
+var datauri = require("datauri")
 var vinyl_buffer = require("vinyl-buffer")
 var vinyl_source = require("vinyl-source-stream")
 
@@ -84,6 +85,40 @@ gulp.task("build:assets", function() {
         .pipe(gulp_connect.reload())
 })
 
+gulp.task("build:tilemaps", function() {
+    gulp.src("./source/assets/tilemaps/**/*.json", {base: "./source"})
+        .pipe(gulp_json_transform(function(world) {
+            var transworld = {}
+            
+            transworld.dimensions = {}
+            transworld.dimensions.width = world.width
+            transworld.dimensions.height = world.height
+            
+            transworld.tileset = {}
+            transworld.tileset.size = world.tilesets[0].tilewidth
+            transworld.tileset.properties = world.tilesets[0].tileproperties
+            transworld.tileset.image = datauri("./source/assets/tilemaps/" + world.tilesets[0].image)
+            
+            transworld.tiles = {}
+            for(var x = 0; x < world.width; x++) {
+                for(var y = 0; y < world.height; y++) {
+                    var id = world.layers[0].data[y * world.width + x] - 1
+                    transworld.tiles[x + "x" + y] = {
+                        "id": id,
+                        "position": {
+                            "x": x,
+                            "y": y
+                        }
+                    }
+                }
+            }
+            
+            return transworld
+        }, 4))
+        .pipe(gulp.dest("./build"))
+        .pipe(gulp_connect.reload())
+})
+
 gulp.task("watch", function() {
     gulp.start([
         "watch:scripts",
@@ -133,5 +168,5 @@ gulp.task("server", function() {
 
 process.on("uncaughtException", function(error) {
     console.log(error.message)
-    //gulp_util.beep()
+    gulp_util.beep()
 })

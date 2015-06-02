@@ -15,6 +15,7 @@
   "devDependencies": {
     "aliasify": "~1.7.2",
     "browserify": "~9.0.3",
+    "datauri": "^0.7.1",
     "del": "~1.1.1",
     "envify": "~3.3.0",
     "esprima-fb": "^15001.1.0-dev-harmony-fb",
