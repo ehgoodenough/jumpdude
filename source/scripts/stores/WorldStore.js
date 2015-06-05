@@ -1,4 +1,4 @@
-var WorldData = require("<assets>/tilemaps/world.json")
+var WorldData = require("<assets>/tilemaps/sketch_world.json")
 
 var WorldStore = Phlux.createStore({
     initiateStore: function() {

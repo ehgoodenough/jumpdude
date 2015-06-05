@@ -114,7 +114,7 @@ gulp.task("build:tilemaps", function() {
             }
             
             return transworld
-        }, 4))
+        }, yargs.argv.minify ? null : 4))
         .pipe(gulp.dest("./build"))
         .pipe(gulp_connect.reload())
 })

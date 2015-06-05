@@ -24,7 +24,7 @@
          "firstgid":1,
          "image":"tileset.png",
          "imageheight":64,
-         "imagewidth":256,
+         "imagewidth":384,
          "margin":0,
          "name":"tileset",
          "properties":
