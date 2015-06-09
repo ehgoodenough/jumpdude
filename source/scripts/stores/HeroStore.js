@@ -132,6 +132,23 @@ var HeroStore = Phlux.createStore({
             delete hero.health
         }
 
+        // Defaults
+        if(hero.position == undefined) {
+            hero.position = {
+                x: hero.spawn.position.x,
+                y: hero.spawn.position.y
+            }
+        }
+        if(hero.velocity == undefined) {
+            hero.velocity = {
+                x: 0,
+                y: 0
+            }
+        }
+        if(hero.health == undefined) {
+            hero.health = hero.maxhealth
+        }
+
         this.trigger()
     }
 })

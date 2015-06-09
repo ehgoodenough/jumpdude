@@ -1,10 +1,10 @@
-var WorldData = require("<assets>/tilemaps/sketch_world.json")
+var WorldData = require("<assets>/tilemaps/tileset_world.json")
 
 var WorldStore = Phlux.createStore({
     initiateStore: function() {
         this.data.width = WorldData.width
         this.data.height = WorldData.height
-        
+
         this.data.tiles = new Object()
         var tileset = WorldData.tilesets[0]
         var tiles = WorldData.layers[0].data
@@ -35,7 +35,7 @@ var WorldStore = Phlux.createStore({
                 }
             }
         }
-        
+
         this.data.image = "./assets/tilemaps/" + tileset.image
     },
     getTile: function(x, y) {
