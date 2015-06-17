@@ -1,7 +1,12 @@
 var WorldData = require("<assets>/tilemaps/tileset_world.json")
 
 var WorldStore = Phlux.createStore({
-    initiateStore: function() {
+    data: {
+        width: WIDTH,
+        height: HEIGHT,
+        tiles: {}
+    },
+    /*initiateStore: function() {
         this.data.width = WorldData.width
         this.data.height = WorldData.height
 
@@ -37,13 +42,13 @@ var WorldStore = Phlux.createStore({
         }
 
         this.data.image = "./assets/tilemaps/" + tileset.image
-    },
+    },*/
     getTile: function(x, y) {
         var x = Math.floor(x)
         var y = Math.floor(y)
         if(x >= 0 && x < this.data.width
         && y >= 0 && y < this.data.height) {
-            return this.data.tiles[x + "x" + y]
+            return this.data.tiles[x + "x" + y] || {}
         } else {
             return {
                 id: 1,
@@ -64,7 +69,8 @@ var WorldStore = Phlux.createStore({
         })
         for(var index in ytiles) {
             var tile = ytiles[index]
-            if(tile.hasCollision) {
+            if(tile != undefined
+            && tile.hasCollision) {
                 if(hero.velocity.y > 0) {
                     hero.position.y = tile.position.y - (hero.height / 2)
                     hero.jump.height = 0
@@ -87,7 +93,8 @@ var WorldStore = Phlux.createStore({
         })
         for(var index in xtiles) {
             var tile = xtiles[index]
-            if(tile.hasCollision) {
+            if(tile != undefined
+            && tile.hasCollision) {
                 if(hero.velocity.x > 0) {
                     hero.position.x = tile.position.x - (hero.width / 2)
                 } else if(hero.velocity.x < 0) {

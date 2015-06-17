@@ -10,6 +10,7 @@
              url("assets/fonts/#{$font}.woff") format("woff"),
              url("assets/fonts/#{$font}.ttf") format("truetype"),
              url("assets/fonts/#{$font}.svg##{$font}") format("svg");
+        src: url("assets/fonts/#{$font}.ttf") format("truetype");
     }
 }
 
