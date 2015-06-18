@@ -97,8 +97,10 @@ var WorldStore = Phlux.createStore({
             && tile.hasCollision) {
                 if(hero.velocity.x > 0) {
                     hero.position.x = tile.position.x - (hero.width / 2)
+                    hero.clinging = "WEST"
                 } else if(hero.velocity.x < 0) {
                     hero.position.x = tile.position.x + 1 + (hero.width / 2)
+                    hero.clinging = "EAST"
                 }
                 hero.velocity.x = 0
             }

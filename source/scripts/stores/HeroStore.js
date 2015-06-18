@@ -15,9 +15,10 @@ var HeroStore = Phlux.createStore({
         jump: {
             force: -10,
             count: 0,
-            maxcount: 2,
+            maxcount: 1,
             height: 0,
-            maxheight: 2.5,
+            maxheight: 2,
+            //maxheight: 2.5
         },
         friction: 2,
         gravity: 2.5,
@@ -27,11 +28,32 @@ var HeroStore = Phlux.createStore({
                 x: 10,
                 y: 13.25
             }
+        },
+        direction: "LEFT",
+        powerups: {
+            highjump: false,
+            doublejump: false,
+            featherfall: false,
+            morphball: false,
+            dashattack: true,
+            wallgrip: true,
         }
     },
     updateHero: function(tick) {
         var hero = this.data
-
+        
+        if(hero.powerups.highjump) {
+            hero.jump.maxheight = 4
+        } if(hero.powerups.doublejump) {
+            hero.jump.maxcount = 2
+        } if(hero.powerups.featherfall) {
+            //?!
+        } if(hero.powerups.morphball) {
+            hero.height = hero.width
+            hero.radius = true
+        }
+        
+        // Defaults
         if(hero.position == undefined) {
             hero.position = {
                 x: hero.spawn.position.x,
@@ -60,8 +82,19 @@ var HeroStore = Phlux.createStore({
             }
         } if(Keyb.isDown("A")) {
             hero.velocity.x -= hero.move.force * tick
+            hero.direction = "LEFT"
         } if(Keyb.isDown("D")) {
             hero.velocity.x += hero.move.force * tick
+            hero.direction = "RIGHT"
+        } if(Keyb.isJustDown("<space>")) {
+            if(hero.powerups.dashattack) {
+                hero.maxvelocity.x = 2
+                if(hero.direction == "LEFT") {
+                    hero.velocity.x = -hero.maxvelocity.x
+                } else if(hero.direction == "RIGHT") {
+                    hero.velocity.x = hero.maxvelocity.x
+                }
+            }
         }
 
         // Maximum Velocity
@@ -73,6 +106,11 @@ var HeroStore = Phlux.createStore({
             hero.velocity.y = hero.maxvelocity.y
         } if(hero.velocity.y < -hero.maxvelocity.y) {
             hero.velocity.y = -hero.maxvelocity.y
+        }
+        if(hero.powerups.dashattack) {
+            if(hero.maxvelocity.x > 0.25) {
+                hero.maxvelocity.x /= 2
+            }
         }
 
         // Collision with World
@@ -94,7 +132,15 @@ var HeroStore = Phlux.createStore({
                 hero.velocity.x = 0
             }
         }
-        hero.velocity.y += hero.gravity * tick
+        if(hero.powerups.featherfall) {
+            if(hero.velocity.y > 0) {
+                hero.velocity.y += (hero.gravity / 10) * tick
+            } else {
+                hero.velocity.y += hero.gravity * tick
+            }
+        } else {
+            hero.velocity.y += hero.gravity * tick
+        }
         if(hero.velocity.y < 0) {
             hero.jump.height -= hero.velocity.y
         }
