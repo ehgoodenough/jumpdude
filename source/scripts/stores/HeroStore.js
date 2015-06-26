@@ -2,34 +2,10 @@ var WorldStore = require("<scripts>/stores/WorldStore")
 
 var HeroStore = Phlux.createStore({
     data: {
-        camera: {
-            position: {
-                x: 3 * -1,
-                y: 144 * -1
-            }
-        },
-        width: 1,
-        height: 1.5,
-        color: "#FC0",
-        maxvelocity: {
-            x: 0.25,
-            y: 0.45
-        },
-        move: {
-            force: 5,
-            friction: 2,
-        },
-        jump: {
-            force: -10,
-            count: 0,
-            maxcount: 2,
-            height: 0,
-            maxheight: 2,
-            //maxheight: 2.5
-        },
-        gravity: 2.5,
-        defaults: {
-            hearts: 10,
+        entity: {
+            width: 1,
+            height: 1.5,
+            color: "#FC0",
             position: {
                 x: 3,
                 y: 144
@@ -37,42 +13,111 @@ var HeroStore = Phlux.createStore({
             velocity: {
                 x: 0,
                 y: 0
+            },
+            move: {
+                force: 5,
+                friction: 2,
+            },
+            jump: {
+                force: -10,
+                count: 0,
+                maxcount: 2,
+                height: 0,
+                maxheight: 2.5,
+            },
+            gravity: 2.5,
+            maxvelocity: {
+                x: 0.25,
+                y: 0.45
+            },
+            direction: "LEFT",
+        },
+        camera: {
+            position: {
+                x: 3 * -1,
+                y: 144 * -1
             }
         },
-        direction: "LEFT",
     },
     updateHero: function(tick) {
         
-        var hero = this.data
+        var entity = this.data.entity
+        var camera = this.data.camera
         
-        // Defaults
-        if(!hero.position) {
-            hero.position = {
-                x: hero.defaults.position.x,
-                y: hero.defaults.position.y
+        // entity is affected by gravity
+        entity.velocity.y = 2.5 * tick
+        
+        // entity vertically collides with the world
+        var tiles = WorldStore.getTiles({
+            "x1": entity.position.x - (entity.width / 2),
+            "x2": entity.position.x + (entity.width / 2),
+            "y1": entity.position.y - (entity.height / 2),
+            "y2": entity.position.y + (entity.height / 2),
+            "dy": entity.velocity.y
+        })
+        for(var index in tiles) {
+            var tile = tiles[index]
+            if(tile.hasCollision) {
+                if(entity.velocity.y > 0) {
+                    entity.position.y = tile.position.y
+                    entity.position.y -= entity.height / 2
+                    entity.velocity.y = 0
+                } else if(entity.velocity.y < 0) {
+                    entity.position.y = tile.position.y + 1
+                    entity.position.y += (hero.height / 2)
+                    entity.velocity.y = 0
+                }
             }
         }
-        if(!hero.velocity) {
-            hero.velocity = {
-                x: hero.defaults.velocity.x,
-                y: hero.defaults.velocity.y
+        
+        // entity horizontally collides with the world
+        var tiles = WorldStore.getTiles({
+            "x1": entity.position.x - (entity.width / 2),
+            "x2": entity.position.x + (entity.width / 2),
+            "y1": entity.position.y - (entity.height / 2),
+            "y2": entity.position.y + (entity.height / 2),
+            "dx": entity.velocity.x
+        })
+        for(var index in tiles) {
+            var tile = tiles[index]
+            if(tile.hasCollision) {
+                if(entity.velocity.x > 0) {
+                    entity.position.x = tile.position.x
+                    entity.position.x -= entity.height / 2
+                    entity.velocity.x = 0
+                } else if(entity.velocity.x < 0) {
+                    entity.position.x = tile.position.x + 1
+                    entity.position.x += (hero.height / 2)
+                    entity.velocity.x = 0
+                }
             }
         }
-        if(!hero.hearts) {
-            hero.hearts = hero.defaults.hearts
-        }
         
-        hero.camera.position.x = (hero.position.x - (WIDTH / 2))
-        hero.camera.position.y = (hero.position.y - (HEIGHT / 2))
+        // entity is moved by velocity
+        entity.position.x += entity.velocity.x
+        entity.position.y += entity.velocity.y
         
-        if(hero.camera.position.x < 0) {
-            hero.camera.position.x = 0
-        } if(hero.camera.position.y < 0) {
-            hero.camera.position.y = 0
-        } if(hero.camera.position.x > WorldStore.getWidth() - WIDTH) {
-            hero.camera.position.x = WorldStore.getWidth() - WIDTH
-        } if(hero.camera.position.y > WorldStore.getHeight() - HEIGHT) {
-            hero.camera.position.y = WorldStore.getHeight() - HEIGHT
+        // entity tracks the world
+        entity.tiles = WorldStore.getTiles({
+            "x1": entity.position.x - (entity.width / 2),
+            "x2": entity.position.x + (entity.width / 2),
+            "y1": entity.position.y - (entity.height / 2),
+            "y2": entity.position.y + (entity.height / 2)
+        })
+        
+        // camera follows the entity
+        camera.position.x = (entity.position.x - (WIDTH / 2))
+        camera.position.y = (entity.position.y - (HEIGHT / 2))
+        
+        // camera fits within screen
+        if(camera.position.x < 0) {
+            camera.position.x = 0
+        } if(camera.position.y < 0) {
+            camera.position.y = 0
+        } if(camera.position.x > WorldStore.getWidth() - WIDTH) {
+            camera.position.x = WorldStore.getWidth() - WIDTH
+        } if(camera.position.y > WorldStore.getHeight() - HEIGHT) {
+            camera.position.y = WorldStore.getHeight() - HEIGHT
         }
         
         this.trigger()

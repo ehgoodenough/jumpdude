@@ -22,9 +22,9 @@ var Game = React.createClass({
     render: function() {
         return (
             <GameFrame aspect-ratio="15x17">
-                <Camera data={this.state.hero}>
+                <Camera data={this.state.hero.camera}>
                     <World data={this.state.world}/>
-                    <Hero data={this.state.hero}/>
+                    <Hero data={this.state.hero.entity}/>
                 </Camera>
             </GameFrame>
         )

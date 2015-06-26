@@ -8,9 +8,9 @@ var Camera = React.createClass({
     },
     renderStyles: function() {
         return {
+            left: this.props.data.position.x * -1 + "em",
+            top: this.props.data.position.y * -1 + "em",
             position: "absolute",
-            top: this.props.data.camera.position.y * -1 + "em",
-            left: this.props.data.camera.position.x * -1 + "em"
         }
     }
 })

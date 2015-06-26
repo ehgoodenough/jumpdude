@@ -25,8 +25,12 @@ var WorldStore = Phlux.createStore({
             for(var y = 0; y < tiledmap.height; y++) {
                 var tile = tiledmap.layers[0].tiles[x + "x" + y]
                 this.data.tiles[x + "x" + y] = {
-                    "position": {"x": x,"y": y},
-                    "color": tile.properties.color
+                    "hasCollision": tile.properties && tile.properties.hasCollision,
+                    "color": tile.properties.color,
+                    "position": {
+                        "x": x,
+                        "y": y
+                    },
                 }
             }
         }
@@ -38,26 +42,25 @@ var WorldStore = Phlux.createStore({
         return this.data.height
     },
     getTile: function(x, y) {
-        var x = Math.floor(x)
-        var y = Math.floor(y)
-        if(x >= 0 && x < this.data.width
-        && y >= 0 && y < this.data.height) {
-            return this.data.tiles[x + "x" + y]
-        } else {
-            return {
-                hasCollision: true,
-                position: {"x": x, "y": y}
-            }
-        }
+        var x = Math.floor(x) % this.data.width
+        var y = Math.floor(y) % this.data.height
+        if(x < 0) {x += this.data.width}
+        if(y < 0) {y += this.data.height}
+        return this.data.tiles[x + "x" + y]
     },
     getTiles: function(box) {
         var tiles = []
-        var x = box.position.x
-        var y = box.position.y
-        var halfwidth = box.width / 2
-        var halfheight = box.height / 2
-        for(var tx = x - halfwidth; tx < Math.ceil(x + halfwidth); tx++) {
-            for(var ty = y - halfheight; ty < Math.ceil(y + halfheight); ty++) {
+        
+        var dx = box.dx || 0
+        var dy = box.dy || 0
+        
+        var x1 = Math.floor(Math.min(box.x1, box.x2) + dx)
+        var x2 = Math.ceil(Math.max(box.x1, box.x2) + dx)
+        var y1 = Math.floor(Math.min(box.y1, box.y2) + dy)
+        var y2 = Math.ceil(Math.max(box.y1, box.y2) + dy)
+        
+        for(var tx = x1; tx < x2; tx++) {
+            for(var ty = y1; ty < y2; ty++) {
                 var tile = this.getTile(tx, ty)
                 tiles.push(tile)
             }
