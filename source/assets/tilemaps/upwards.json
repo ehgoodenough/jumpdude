@@ -33,6 +33,30 @@
             },
          "spacing":0,
          "tileheight":32,
+         "tileproperties":
+            {
+             "0":
+                {
+                 "color":"rgb(238, 238, 238)"
+                },
+             "1":
+                {
+                 "color":"rgb(0, 0, 0)",
+                 "hasCollision":"true"
+                },
+             "2":
+                {
+                 "color":"rgb(255, 201, 14)"
+                },
+             "3":
+                {
+                 "color":"rgb(195, 195, 195)"
+                },
+             "4":
+                {
+                 "color":"rgb(127, 127, 127)"
+                }
+            },
          "tilewidth":32
         }],
  "tilewidth":32,
