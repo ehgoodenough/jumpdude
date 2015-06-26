@@ -31,6 +31,12 @@ var WorldStore = Phlux.createStore({
             }
         }
     },
+    getWidth: function() {
+        return this.data.width
+    },
+    getHeight: function() {
+        return this.data.height
+    },
     getTile: function(x, y) {
         var x = Math.floor(x)
         var y = Math.floor(y)
