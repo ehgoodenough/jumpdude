@@ -14,10 +14,6 @@ var HeroStore = Phlux.createStore({
                 x: 0,
                 y: 0
             },
-            move: {
-                force: 5,
-                friction: 2,
-            },
             jump: {
                 force: -10,
                 count: 0,
@@ -25,10 +21,13 @@ var HeroStore = Phlux.createStore({
                 height: 0,
                 maxheight: 2.5,
             },
-            gravity: 2.5,
-            maxvelocity: {
-                x: 0.25,
-                y: 0.45
+            maximum: {
+                velocity: {
+                    "-x": -0.25,
+                    "+x": 0.25,
+                    "-y": -0.5,
+                    "+y": 0.25
+                },
             },
             direction: "LEFT",
         },
@@ -44,10 +43,34 @@ var HeroStore = Phlux.createStore({
         var entity = this.data.entity
         var camera = this.data.camera
         
-        // entity is affected by gravity
-        entity.velocity.y = 2.5 * tick
+        if(Keyb.isDown("A")) {
+            entity.velocity.x -= 3.5 * tick
+            entity.direction = "left"
+        }
+        if(Keyb.isDown("D")) {
+            entity.velocity.x += 3.5 * tick
+            entity.direction = "right"
+        }
         
-        // entity vertically collides with the world
+        // entity is affected by gravity
+        entity.velocity.y += 2.5 * tick
+        
+        // entity is limited by maximum velocity
+        if(entity.velocity.y < entity.maximum.velocity["-y"]) {
+            entity.velocity.y = entity.maximum.velocity["-y"]
+        }
+        if(entity.velocity.y > entity.maximum.velocity["+y"]) {
+            entity.velocity.y = entity.maximum.velocity["+y"]
+        }
+        if(entity.velocity.x < entity.maximum.velocity["-x"]) {
+            entity.velocity.x = entity.maximum.velocity["-x"]
+        }
+        if(entity.velocity.x > entity.maximum.velocity["+x"]) {
+            entity.velocity.x = entity.maximum.velocity["+x"]
+        }
+        console.log(entity.velocity.x)
+        
+        // entity collides with the world
         var tiles = WorldStore.getTiles({
             "x1": entity.position.x - (entity.width / 2),
             "x2": entity.position.x + (entity.width / 2),
@@ -64,13 +87,11 @@ var HeroStore = Phlux.createStore({
                     entity.velocity.y = 0
                 } else if(entity.velocity.y < 0) {
                     entity.position.y = tile.position.y + 1
-                    entity.position.y += (hero.height / 2)
+                    entity.position.y += (entity.height / 2)
                     entity.velocity.y = 0
                 }
             }
         }
-        
-        // entity horizontally collides with the world
         var tiles = WorldStore.getTiles({
             "x1": entity.position.x - (entity.width / 2),
             "x2": entity.position.x + (entity.width / 2),
@@ -87,7 +108,7 @@ var HeroStore = Phlux.createStore({
                     entity.velocity.x = 0
                 } else if(entity.velocity.x < 0) {
                     entity.position.x = tile.position.x + 1
-                    entity.position.x += (hero.height / 2)
+                    entity.position.x += (entity.height / 2)
                     entity.velocity.x = 0
                 }
             }
@@ -96,6 +117,19 @@ var HeroStore = Phlux.createStore({
         // entity is moved by velocity
         entity.position.x += entity.velocity.x
         entity.position.y += entity.velocity.y
+        
+        // entity decelerates from friction
+        if(entity.velocity.x > 0) {
+            entity.velocity.x -= 1.5 * tick
+            if(entity.velocity.x < 0) {
+                entity.velocity.x = 0
+            }
+        } else if(entity.velocity.x < 0) {
+            entity.velocity.x += 1.5 * tick
+            if(entity.velocity.x > 0) {
+                entity.velocity.x = 0
+            }
+        }
         
         // entity tracks the world
         entity.tiles = WorldStore.getTiles({
@@ -112,11 +146,14 @@ var HeroStore = Phlux.createStore({
         // camera fits within screen
         if(camera.position.x < 0) {
             camera.position.x = 0
-        } if(camera.position.y < 0) {
-            camera.position.y = 0
-        } if(camera.position.x > WorldStore.getWidth() - WIDTH) {
+        }
+        if(camera.position.x > WorldStore.getWidth() - WIDTH) {
             camera.position.x = WorldStore.getWidth() - WIDTH
-        } if(camera.position.y > WorldStore.getHeight() - HEIGHT) {
+        }
+        if(camera.position.y < 0) {
+            camera.position.y = 0
+        }
+        if(camera.position.y > WorldStore.getHeight() - HEIGHT) {
             camera.position.y = WorldStore.getHeight() - HEIGHT
         }
         

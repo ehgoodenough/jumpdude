@@ -2,7 +2,6 @@ var Hero = React.createClass({
     render: function() {
         return (
             <div>
-                {this.renderTiles()}
                 <div style={this.renderStyles()}/>
             </div>
         )
