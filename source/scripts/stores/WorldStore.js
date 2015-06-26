@@ -1,4 +1,4 @@
-var WorldData = require("<assets>/tilemaps/tileset_world.json")
+var WorldData = require("<assets>/tilemaps/upwards.json")
 
 var WorldStore = Phlux.createStore({
     data: {

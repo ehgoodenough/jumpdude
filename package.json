@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "keyb": "^1.0.4",
-    "phlux": "^1.0.2",
+    "phlux": "^1.0.5",
     "react": "~0.12.2",
     "tickly": "^1.0.1"
   },

@@ -3,16 +3,16 @@ window.Phlux = require("phlux")
 window.Tickly = require("tickly")
 window.Keyb = require("keyb")
 
-window.WIDTH = 20
-window.HEIGHT = 15
+window.WIDTH = 15
+window.HEIGHT = 20
 
-var Hero = require("<scripts>/components/Hero")
-var World = require("<scripts>/components/World")
+var Hero = require("<scripts>/views/Hero")
+var World = require("<scripts>/views/World")
 var HeroStore = require("<scripts>/stores/HeroStore")
 var WorldStore = require("<scripts>/stores/WorldStore")
 
-var Camera = require("<scripts>/components/Camera")
-var GameFrame = require("<scripts>/components/GameFrame")
+var Camera = require("<scripts>/views/Camera")
+var GameFrame = require("<scripts>/views/GameFrame")
 
 var Game = React.createClass({
     mixins: [
@@ -21,12 +21,11 @@ var Game = React.createClass({
     ],
     render: function() {
         return (
-            <GameFrame aspect-ratio="20x15">
-                <Camera target={this.state["hero"]}>
-                    <World data={this.state["world"]}/>
-                    <Hero data={this.state["hero"]}/>
+            <GameFrame aspect-ratio="15x20">
+                <Camera target={this.state.hero}>
+                    <World data={this.state.world}/>
+                    <Hero data={this.state.hero}/>
                 </Camera>
-                <span>Use WASD to move and jump!</span>
             </GameFrame>
         )
     },
