@@ -16,7 +16,6 @@ var reactify = require("reactify")
 var envify = require("envify/custom")
 var aliasify = require("aliasify")
 
-var opn = require("opn")
 var del = require("del")
 var yargs = require("yargs")
 var datauri = require("datauri")
@@ -53,8 +52,6 @@ gulp.task("build", function() {
 })
 
 gulp.task("build:scripts", function() {
-    //gulp.src("./source/**/*.js")
-    //    .pipe(gulp_jscs("./.jscsrc"))
     browserify.bundle()
         .pipe(vinyl_source("index.js"))
         .pipe(vinyl_buffer())
@@ -81,40 +78,6 @@ gulp.task("build:markup", function() {
 
 gulp.task("build:assets", function() {
     gulp.src("./source/assets/**/*", {base: "./source"})
-        .pipe(gulp.dest("./build"))
-        .pipe(gulp_connect.reload())
-})
-
-gulp.task("build:tilemaps", function() {
-    gulp.src("./source/assets/tilemaps/**/*.json", {base: "./source"})
-        .pipe(gulp_json_transform(function(world) {
-            var transworld = {}
-            
-            transworld.dimensions = {}
-            transworld.dimensions.width = world.width
-            transworld.dimensions.height = world.height
-            
-            transworld.tileset = {}
-            transworld.tileset.size = world.tilesets[0].tilewidth
-            transworld.tileset.properties = world.tilesets[0].tileproperties
-            transworld.tileset.image = datauri("./source/assets/tilemaps/" + world.tilesets[0].image)
-            
-            transworld.tiles = {}
-            for(var x = 0; x < world.width; x++) {
-                for(var y = 0; y < world.height; y++) {
-                    var id = world.layers[0].data[y * world.width + x] - 1
-                    transworld.tiles[x + "x" + y] = {
-                        "id": id,
-                        "position": {
-                            "x": x,
-                            "y": y
-                        }
-                    }
-                }
-            }
-            
-            return transworld
-        }, yargs.argv.minify ? null : 4))
         .pipe(gulp.dest("./build"))
         .pipe(gulp_connect.reload())
 })
@@ -163,7 +126,6 @@ gulp.task("server", function() {
         livereload: true,
         port: 8080
     })
-    opn("http://localhost:8080")
 })
 
 process.on("uncaughtException", function(error) {
