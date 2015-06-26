@@ -1,9 +1,7 @@
 var Hero = React.createClass({
     render: function() {
         return (
-            <div>
-                <div style={this.renderStyles()}/>
-            </div>
+            <div style={this.renderStyles()}/>
         )
     },
     renderStyles: function() {

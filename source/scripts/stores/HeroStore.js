@@ -14,22 +14,24 @@ var HeroStore = Phlux.createStore({
                 x: 0,
                 y: 0
             },
+            direction: {
+                x: "left",
+                y: null
+            },
             jump: {
-                force: -10,
-                count: 0,
-                maxcount: 2,
                 height: 0,
-                maxheight: 2.5,
             },
             maximum: {
                 velocity: {
                     "-x": -0.25,
                     "+x": 0.25,
-                    "-y": -0.5,
-                    "+y": 0.25
+                    "-y": -0.7,
+                    "+y": 0.7
                 },
+                jump: {
+                    height: 3
+                }
             },
-            direction: "LEFT",
         },
         camera: {
             position: {
@@ -43,13 +45,19 @@ var HeroStore = Phlux.createStore({
         var entity = this.data.entity
         var camera = this.data.camera
         
+        // entity responds to keyboard input
+        if(Keyb.isJustDown("W")) {
+            if(entity.jump.height < entity.maximum.jump.height) {
+                entity.velocity.y = entity.maximum.velocity["-y"]
+            }
+        }
         if(Keyb.isDown("A")) {
             entity.velocity.x -= 3.5 * tick
-            entity.direction = "left"
+            entity.direction.x = "left"
         }
         if(Keyb.isDown("D")) {
             entity.velocity.x += 3.5 * tick
-            entity.direction = "right"
+            entity.direction.x = "right"
         }
         
         // entity is affected by gravity
@@ -68,7 +76,6 @@ var HeroStore = Phlux.createStore({
         if(entity.velocity.x > entity.maximum.velocity["+x"]) {
             entity.velocity.x = entity.maximum.velocity["+x"]
         }
-        console.log(entity.velocity.x)
         
         // entity collides with the world
         var tiles = WorldStore.getTiles({
@@ -85,10 +92,12 @@ var HeroStore = Phlux.createStore({
                     entity.position.y = tile.position.y
                     entity.position.y -= entity.height / 2
                     entity.velocity.y = 0
+                    entity.jump.height = 0
                 } else if(entity.velocity.y < 0) {
                     entity.position.y = tile.position.y + 1
-                    entity.position.y += (entity.height / 2)
+                    entity.position.y += entity.height / 2
                     entity.velocity.y = 0
+                    entity.jump.height = entity.maximum.jump.height
                 }
             }
         }
@@ -104,11 +113,11 @@ var HeroStore = Phlux.createStore({
             if(tile.hasCollision) {
                 if(entity.velocity.x > 0) {
                     entity.position.x = tile.position.x
-                    entity.position.x -= entity.height / 2
+                    entity.position.x -= entity.width / 2
                     entity.velocity.x = 0
                 } else if(entity.velocity.x < 0) {
                     entity.position.x = tile.position.x + 1
-                    entity.position.x += (entity.height / 2)
+                    entity.position.x += entity.width / 2
                     entity.velocity.x = 0
                 }
             }
@@ -117,6 +126,19 @@ var HeroStore = Phlux.createStore({
         // entity is moved by velocity
         entity.position.x += entity.velocity.x
         entity.position.y += entity.velocity.y
+        
+        // entity wraps around the world
+        if(entity.position.x < 0) {
+            entity.position.x = WorldStore.getWidth()
+        }
+        if(entity.position.x > WorldStore.getWidth()) {
+            entity.position.x = 0
+        }
+        
+        // entity tracks height of jumps
+        if(entity.velocity.y < 0) {
+            entity.jump.height -= entity.velocity.y
+        }
         
         // entity decelerates from friction
         if(entity.velocity.x > 0) {
