@@ -1,16 +1,14 @@
-var GameFrame = React.createClass({
-    getDefaultProps: function() {
-        return {
-            "aspect-ratio": "20x15"
-        }
-    },
+var React = require("react")
+
+var FrameView = React.createClass({
     render: function() {
         return (
             <div {...this.props}
-                style={this.renderStyles()}/>
+                className="frame-view"
+                style={this.renderStyle()}/>
         )
     },
-    renderStyles: function() {
+    renderStyle: function() {
         var styles = {
             top: "0rem",
             left: "0rem",
@@ -21,16 +19,16 @@ var GameFrame = React.createClass({
             overflow: "hidden",
             backgroundColor: "#EEE"
         }
-        var width = this.props["aspect-ratio"].split("x")[0]
-        var height = this.props["aspect-ratio"].split("x")[1]
+        var width = this.props.width || 640
+        var height = this.props.height || 480
         if(window.innerWidth / window.innerHeight > width / height) {
             styles.fontSize = (width / height * 100) / width + "vh"
             styles.width = width / height * 100 + "vh"
             styles.height = 100 + "vh"
         } else {
-            styles.width = 100 + "vw"
-            styles.height = (height / width) * 100 + "vw"
             styles.fontSize = ((height / width) * 100) / height + "vw"
+            styles.height = (height / width) * 100 + "vw"
+            styles.width = 100 + "vw"
         }
         return styles
     },
@@ -45,4 +43,4 @@ var GameFrame = React.createClass({
     }
 })
 
-module.exports = GameFrame
+module.exports = FrameView

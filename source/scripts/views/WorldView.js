@@ -1,3 +1,5 @@
+var React = require("react")
+
 var px = 64
 
 var World = React.createClass({

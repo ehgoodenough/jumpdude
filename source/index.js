@@ -1,39 +1,44 @@
-window.React = require("react")
-window.Phlux = require("phlux")
-window.Tickly = require("tickly")
-window.Keyb = require("keyb")
+var Loop = require("<scripts>/functions/Loop")
 
-window.WIDTH = 15
-window.HEIGHT = 17
+var Hero = require("<scripts>/models/Hero")
+var World = require("<scripts>/models/World")
+var Camera = require("<scripts>/models/Camera")
 
-var Hero = require("<scripts>/views/Hero")
-var World = require("<scripts>/views/World")
-var HeroStore = require("<scripts>/stores/HeroStore")
-var WorldStore = require("<scripts>/stores/WorldStore")
+window.game = {
+    hero: new Hero(),
+    world: new World(),
+    camera: new Camera(),
+    frame: {
+        width: 15,
+        height: 17,
+    }
+}
 
-var Camera = require("<scripts>/views/Camera")
-var GameFrame = require("<scripts>/views/GameFrame")
+var HeroView = require("<scripts>/views/HeroView")
+var WorldView = require("<scripts>/views/WorldView")
+var FrameView = require("<scripts>/views/FrameView")
+var CameraView = require("<scripts>/views/CameraView")
 
-var Game = React.createClass({
-    mixins: [
-        Phlux.connectStore(HeroStore, "hero"),
-        Phlux.connectStore(WorldStore, "world")
-    ],
+var React = require("react")
+
+var GameView = React.createClass({
     render: function() {
         return (
-            <GameFrame aspect-ratio="15x17">
-                <Camera data={this.state.hero.camera}>
-                    <World data={this.state.world}/>
-                    <Hero data={this.state.hero.entity}/>
-                </Camera>
-            </GameFrame>
+            <FrameView width={game.frame.width} height={game.frame.height}>
+                <CameraView data={game.camera}>
+                    <WorldView data={game.world}/>
+                    <HeroView data={game.hero}/>
+                </CameraView>
+            </FrameView>
         )
     },
     componentDidMount: function() {
-        Tickly.loop(function(tick) {
-            HeroStore.updateHero(tick)
-        })
+        Loop(function(tick) {
+            game.hero.update(tick)
+            game.camera.update(tick)
+            this.forceUpdate()
+        }.bind(this))
     }
 })
 
-React.render(<Game/>, document.body)
+React.render(<GameView/>, document.body)
