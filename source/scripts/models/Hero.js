@@ -81,6 +81,7 @@ Hero.prototype.update = function(tick) {
                 this.position.y -= this.height / 2
                 this.velocity.y = 0
                 this.jump.height = 0
+                game.camera.setFocus(this.position)
             } else if(this.velocity.y < 0) {
                 this.position.y = tile.position.y + 1
                 this.position.y += this.height / 2
