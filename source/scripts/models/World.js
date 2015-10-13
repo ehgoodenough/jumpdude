@@ -22,7 +22,7 @@ var World = function() {
         for(var y = 0; y < tiledmap.height; y++) {
             var tile = tiledmap.layers[0].tiles[x + "x" + y]
             this.tiles[x + "x" + y] = {
-                "hasCollision": tile.properties && tile.properties.hasCollision,
+                "hasCollision": tile.properties && tile.properties.blocks,
                 "color": tile.properties.color,
                 "position": {
                     "x": x,

@@ -7,7 +7,7 @@ var Hero = function() {
         color: "#FC0",
         position: {
             x: 3,
-            y: 144
+            y: 148
         },
         velocity: {
             x: 0,

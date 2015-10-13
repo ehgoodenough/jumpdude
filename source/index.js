@@ -1,5 +1,4 @@
 var Loop = require("<scripts>/functions/Loop")
-var Frame = require("<scripts>/functions/Frame")
 
 var Hero = require("<scripts>/models/Hero")
 var World = require("<scripts>/models/World")
@@ -8,7 +7,11 @@ var Camera = require("<scripts>/models/Camera")
 window.game = {
     hero: new Hero(),
     world: new World(),
-    camera: new Camera()
+    camera: new Camera(),
+    frame: {
+        width: 15,
+        height: 17,
+    }
 }
 
 var HeroView = require("<scripts>/views/HeroView")
@@ -21,7 +24,7 @@ var React = require("react")
 var GameView = React.createClass({
     render: function() {
         return (
-            <FrameView width={Frame.width} height={Frame.height}>
+            <FrameView width={game.frame.width} height={game.frame.height}>
                 <CameraView data={game.camera}>
                     <WorldView data={game.world}/>
                     <HeroView data={game.hero}/>
