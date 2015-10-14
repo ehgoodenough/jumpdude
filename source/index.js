@@ -33,6 +33,7 @@ var GameView = React.createClass({
         )
     },
     componentDidMount: function() {
+        game.camera.setFocus(game.hero.position)
         Loop(function(tick) {
             game.hero.update(tick)
             game.camera.update(tick)
