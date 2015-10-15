@@ -13,9 +13,6 @@ var CameraView = React.createClass({
             position: "absolute",
             top: this.props.data.position.y * -1 + "em",
             left: this.props.data.position.x * -1 + "em",
-            transitionTimingFunction: "ease-in-out",
-            transitionProperty: "left top",
-            transitionDuration: "1.5s",
         }
     }
 })

@@ -31,6 +31,12 @@ var Hero = function() {
                 height: 3
             }
         },
+        savepoint: {
+            position: {
+                x: 3,
+                y: 148,
+            }
+        },
     }
     for(var key in protohero) {
         this[key] = protohero[key]
@@ -81,7 +87,9 @@ Hero.prototype.update = function(tick) {
                 this.position.y -= this.height / 2
                 this.velocity.y = 0
                 this.jump.height = 0
-                game.camera.setFocus(this.position)
+                if(this.position.y < game.camera.position.y + game.frame.height) {
+                    game.camera.setFocus(this.position)
+                }
             } else if(this.velocity.y < 0) {
                 this.position.y = tile.position.y + 1
                 this.position.y += this.height / 2
@@ -148,6 +156,13 @@ Hero.prototype.update = function(tick) {
         "y1": this.position.y - (this.height / 2),
         "y2": this.position.y + (this.height / 2)
     })
+
+    if(this.position.y - (this.height / 2) > game.camera.position.y + game.frame.height) {
+        this.position.x = this.savepoint.position.x
+        this.position.y = this.savepoint.position.y
+        game.camera.setFocus(this.position, true)
+        console.log("You died!!")
+    }
 }
 
 module.exports = Hero
