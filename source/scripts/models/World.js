@@ -1,12 +1,11 @@
-var Frame = require("<scripts>/functions/Frame")
 var TiledMap = require("<scripts>/functions/TiledMap.js")
-var WorldData = require("<assets>/tilemaps/upwards.json")
+var WorldData = require("<source>/tilemaps/upwards.json")
 
 var World = function() {
     var protoworld = {
         tiles: {},
-        width: Frame.width,
-        height: Frame.height
+        width: 0,
+        height: 0
     }
     for(var key in protoworld) {
         this[key] = protoworld[key]

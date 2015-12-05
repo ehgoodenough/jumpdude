@@ -1,8 +1,7 @@
-@import "./styles/fonts.scss";
-@import "./styles/defaults.scss";
-
-html
-{
-    font-family: goldfish;
-    background-color: #fcfcfc;
+* {
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    user-select: none;
+    box-sizing: border-box;
 }
